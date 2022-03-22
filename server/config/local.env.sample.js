@@ -4,7 +4,7 @@
 // You will need to set these on the server you deploy to.
 
 module.exports = {
-  DOMAIN:           'http://localhost:9001',
+  DOMAIN:           'http://localhost:9002',
   SESSION_SECRET:   'iot-traffic-lights-secret',
 
   // Control debug level for modules using visionmedia/debug

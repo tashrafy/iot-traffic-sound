@@ -1,12 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import Agenda from "agenda";
-import {each, isEmpty} from "lodash";
 import config from "../config/environment";
+import { scheduleReoccurringJob } from "./utilities";
+import * as toggleSoundJob from './toggle-sound-job';
 import tts from "../services/text-to-speech";
-import axios from 'axios';
-var opts;
-const player = require('play-sound')(opts = {});
-const endpoint = `http://${config.domain}:${config.port}`;
 
 const moment = require("moment");
 require("moment-timezone");
@@ -17,64 +14,27 @@ const agenda = new Agenda({
   },
 });
 
-async function scheduleReoccurringJob(name, interval, timezone, data) {
-  const job = agenda.create(name, data);
-  job.repeatEvery(interval, {
-    timezone,
-  });
-  job.computeNextRunAt();
-  await job.save();
-}
-
 agenda.on("ready", () => {
-  console.log('AGENDA INITIALIZED');
-  console.log(endpoint, config.audio);
+  console.log('AGENDA INITIALIZED IOT TRAFFIC SOUND');
+  console.log(config.audio);
+
+  const initJobName = "Initialize Sound Modality";
 
   agenda.defaultConcurrency(50);
 
-  agenda.define("Initialize Capture", async function(job, done) {
-    const userId = uuidv4();
-
-    await scheduleReoccurringJob("Collect Traffic", "2 seconds", "America/New_York", userId);
+  agenda.define(initJobName, async function(job, done) {
+    const userId = process.env.UUID || uuidv4();
 
     if (config.audio.enabled) {
-      await scheduleReoccurringJob("Run Audio Modality", "10 seconds", "America/New_York", userId);
+      await scheduleReoccurringJob(toggleSoundJob.jobName, "10 seconds", "America/New_York", userId);
     }
 
     done();
   });
 
-  agenda.define("Collect Traffic", async function(job, done) {
-    const userId = job.attrs.data;
-    const { data: devices } = await axios.get(`${endpoint}/api/iot-inspector/subscribe`);
-    const { data: traffic } = await axios.get(`${endpoint}/api/iot-inspector/get_traffic`, {
-      params: {
-        userId
-      }
-    });
+  agenda.define(toggleSoundJob.jobName, toggleSoundJob.jobHandler);
 
-    done();
-  });
-
-  agenda.define("Run Audio Modality", async function(job, done) {
-    const { trackingTraffic, regularTraffic } = await getTrackingData(job.attrs.data);
-
-    console.log("running audio modality");
-
-    if (trackingTraffic) {
-      console.log("trackingTraffic", trackingTraffic);
-
-      player.play('./tracking-traffic-english.mp3', console.log);
-    } else if (regularTraffic) {
-      console.log("regularTraffic", regularTraffic);
-
-      player.play('./warning-traffic-english.mp3', console.log);
-    }
-
-    done();
-  });
-
-  agenda.now("Initialize Capture");
+  agenda.now(initJobName);
 
   agenda.on("start", (job) => {
     // log necessary info
@@ -87,30 +47,7 @@ agenda.on("ready", () => {
   agenda.on("fail", (err, job) => {
     // log necessary info
   });
-
-  // agenda.cancel({name: cleanUpJob.jobName}, () => {
-  //   agenda.every("0 0 * * *", cleanUpJob.jobName);
-  // });
-
-  if (config.env === "production") {
-    // agenda.cancel({name: clientJobSchedulerJob.jobName}, () => {
-    //   agenda.every("0 0 * * *", clientJobSchedulerJob.jobName);
-    // });
-  }
 });
-
-async function getTrackingData(userId) {
-  const { data: traffic } = await axios.get(`${endpoint}/api/iot-inspector/aggregate_traffic`, {
-    params: {
-      userId
-    }
-  });
-  console.log("getTrackingData", traffic);
-  const trackingTraffic = traffic.find(item => item._id.isTracking);
-  const regularTraffic = traffic.find(item => !item._id.isTracking);
-
-  return { trackingTraffic, regularTraffic };
-}
 
 function graceful() {
   agenda.stop(() => {

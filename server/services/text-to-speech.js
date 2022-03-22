@@ -11,13 +11,13 @@ googleTTS
   .getAudioBase64(audio.warningTts, audioTtsOptions)
   .then((warningBase64) => {
     const buffer = Buffer.from(warningBase64, 'base64');
-    fs.writeFileSync('warning-traffic-english.mp3', buffer, { encoding: 'base64' });
+    fs.writeFileSync('server/agenda/warning-traffic-english.mp3', buffer, { encoding: 'base64' });
   })
   .then(() =>
     googleTTS
       .getAudioBase64(audio.trackingTts, audioTtsOptions))
   .then((trackingBase64) => {
     const buffer = Buffer.from(trackingBase64, 'base64');
-    fs.writeFileSync('tracking-traffic-english.mp3', buffer, { encoding: 'base64' });
+    fs.writeFileSync('server/agenda/tracking-traffic-english.mp3', buffer, { encoding: 'base64' });
   })
   .catch(console.error);

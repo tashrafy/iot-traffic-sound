@@ -8,10 +8,6 @@ mongoose.connect(config.mongo.uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => {
-  // Populate databases with sample data
-  if (config.seedDB) { require('./config/seed'); }
-})
 .catch((err) => {
   console.error('MongoDB connection error: ' + err);
   process.exit(-1);

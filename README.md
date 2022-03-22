@@ -1,4 +1,4 @@
-# IoT Traffic Lights
+# IoT Traffic Sound
 This application leverages the Philip's Hue API to set the hue and brightness of a user's smart lights based on the flow of traffic received from the IoT Inspector API.  To mock the Philip's Hue smart lights, we will use an emulator to reproduce similar behaviors.
 
 ### Prerequisites

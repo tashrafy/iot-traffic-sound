@@ -1,6 +1,6 @@
 {
-  "name": "iot-traffic-lights",
-  "description": "Scheduled jobs to collect data from IoT Inspector and trigger smart lights via Hue API",
+  "name": "iot-traffic-sound",
+  "description": "Scheduled jobs to collect data from IoT Inspector and trigger audio notifications.",
   "version": "1.0.0",
   "main": "server/app.js",
   "dependencies": {
