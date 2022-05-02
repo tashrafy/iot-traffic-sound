@@ -40,9 +40,14 @@ var all = {
   },
 
   audio: {
-    enabled: Boolean(process.env.ENABLE_AUDIO) || true,
+    enabled: process.env.ENABLE_AUDIO === 'true' || false,
     warningTts: process.env.WARNING_TRAFFIC_TTS || "A flow of potentially concerning traffic has been identified from a device on the network.",
-    trackingTts: process.env.TRACKING_TRAFFIC_TTS || "A flow of tracking traffic has been identified from a device on the network."
+    trackingTts: process.env.TRACKING_TRAFFIC_TTS || "A flow of tracking traffic has been identified from a device on the network.",
+    sound: {
+      warning: process.env.WARNING_TRAFFIC_SOUND || 'warning-traffic-english.mp3',
+      tracking: process.env.TRACKING_TRAFFIC_SOUND || 'tracking-traffic-english.mp3',
+      secure: process.env.SECURE_TRAFFIC_SOUND || ''
+    }
   }
 };
 

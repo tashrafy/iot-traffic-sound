@@ -26,7 +26,7 @@ agenda.on("ready", () => {
     const userId = process.env.UUID || uuidv4();
 
     if (config.audio.enabled) {
-      await scheduleReoccurringJob(toggleSoundJob.jobName, "10 seconds", "America/New_York", userId);
+      await scheduleReoccurringJob(toggleSoundJob.jobName, "2 seconds", "America/New_York", userId);
     }
 
     done();
